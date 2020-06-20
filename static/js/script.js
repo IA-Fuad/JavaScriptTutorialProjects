@@ -20,3 +20,12 @@ function reset() {
   document.getElementById("ageInDays").remove();
   clicked = false;
 }
+
+// Challenge 2
+function generateCat() {
+  let image = document.createElement("img");
+  let div = document.getElementById("flex-cat-gen");
+  image.src =
+    "https://i.pinimg.com/originals/c3/2b/fa/c32bfa16bcf864e478d3ddfe32440268.gif";
+  div.appendChild(image);
+}
