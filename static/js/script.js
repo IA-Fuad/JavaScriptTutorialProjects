@@ -50,10 +50,10 @@ function randomBot(option) {
 
 function decideWiner(humanChoice, botChoice) {
   let combinations = {
-    'rock': { 'scissor': 1, 'rock': 0.5, 'paper': 0 },
-    'paper': { 'rock': 1, 'paper': 0.5, 'scissor': 0 },
-    'scissor': { 'paper': 1, 'scissor': 0.5, 'rock': 0 },
-  }
+    rock: { scissor: 1, rock: 0.5, paper: 0 },
+    paper: { rock: 1, paper: 0.5, scissor: 0 },
+    scissor: { paper: 1, scissor: 0.5, rock: 0 },
+  };
   let yourScore = combinations[humanChoice][botChoice];
   let botScore = combinations[botChoice][humanChoice];
 
@@ -62,34 +62,95 @@ function decideWiner(humanChoice, botChoice) {
 
 function finalMessage(results) {
   if (results[0] === results[1]) {
-    return ['You Tied', 'yellow'];
+    return ["You Tied", "yellow"];
   }
   if (results[0] == 1) {
-    return ['You Won!', 'green'];
+    return ["You Won!", "green"];
   }
-  return ['You Lost!', 'red'];
+  return ["You Lost!", "red"];
 }
 
 function rpsFrontEnd(humanImageChoice, botImageChoice, finalMessage) {
   let imageData = {
-    'rock': document.getElementById('rock').src,
-    'paper': document.getElementById('paper').src,
-    'scissor': document.getElementById('scissor').src,
+    rock: document.getElementById("rock").src,
+    paper: document.getElementById("paper").src,
+    scissor: document.getElementById("scissor").src,
+  };
+
+  document.getElementById("rock").remove();
+  document.getElementById("paper").remove();
+  document.getElementById("scissor").remove();
+
+  let humanDiv = document.createElement("div");
+  let botDiv = document.createElement("div");
+  let messageDiv = document.createElement("div");
+
+  humanDiv.innerHTML =
+    "<img src='" +
+    imageData[humanImageChoice] +
+    "' height=150 width=150 style='box-shadow: 0px 10px 50px rgba(37, 50, 233, 1);'>";
+  messageDiv.innerHTML =
+    "<h1 style='color: " +
+    finalMessage[1] +
+    "; font-size: 60px; padding: 30px' '>" +
+    finalMessage[0] +
+    "</h1>";
+  botDiv.innerHTML =
+    "<img src='" +
+    imageData[botImageChoice] +
+    "' height=150 width=150 style='box-shadow: 0px 10px 50px rgba(243, 38, 24, 1);'>";
+
+  document.getElementById("flex-box-rps-div").appendChild(humanDiv);
+  document.getElementById("flex-box-rps-div").appendChild(messageDiv);
+  document.getElementById("flex-box-rps-div").appendChild(botDiv);
+}
+
+// Challenge 4
+let all_button = document.getElementsByTagName("button");
+let mainColor = [];
+for (let i = 0; i < all_button.length; i++) {
+  mainColor.push(all_button[i].classList[1]);
+}
+uniqueColor = new Set(mainColor);
+colors = Array.from(uniqueColor);
+
+function buttonColorChange(buttonOption) {
+  if (buttonOption.value == "red") {
+    buttonsRed();
+  } else if (buttonOption.value == "green") {
+    buttonsGreen();
+  } else if (buttonOption.value == "reset") {
+    buttonsReset();
+  } else {
+    buttonRandom();
   }
+}
 
-  document.getElementById('rock').remove();
-  document.getElementById('paper').remove();
-  document.getElementById('scissor').remove();
+function buttonsRed() {
+  for (let i = 0; i < all_button.length; i++) {
+    all_button[i].classList.remove(all_button[i].classList[1]);
+    all_button[i].classList.add("btn-danger");
+  }
+}
 
-  let humanDiv = document.createElement('div');
-  let botDiv = document.createElement('div');
-  let messageDiv = document.createElement('div');
+function buttonsGreen() {
+  for (let i = 0; i < all_button.length; i++) {
+    all_button[i].classList.remove(all_button[i].classList[1]);
+    all_button[i].classList.add("btn-success");
+  }
+}
 
-  humanDiv.innerHTML = "<img src='" + imageData[humanImageChoice] + "' height=150 width=150 style='box-shadow: 0px 10px 50px rgba(37, 50, 233, 1);'>";
-  messageDiv.innerHTML = "<h1 style='color: " + finalMessage[1] + "; font-size: 60px; padding: 30px' '>" + finalMessage[0] + "</h1>";
-  botDiv.innerHTML = "<img src='" + imageData[botImageChoice] + "' height=150 width=150 style='box-shadow: 0px 10px 50px rgba(243, 38, 24, 1);'>";
+function buttonsReset() {
+  for (let i = 0; i < all_button.length; i++) {
+    all_button[i].classList.remove(all_button[i].classList[1]);
+    all_button[i].classList.add(mainColor[i]);
+  }
+}
 
-  document.getElementById('flex-box-rps-div').appendChild(humanDiv);
-  document.getElementById('flex-box-rps-div').appendChild(messageDiv);
-  document.getElementById('flex-box-rps-div').appendChild(botDiv);
+function buttonRandom() {
+  for (let i = 0; i < all_button.length; i++) {
+    random = Math.floor(Math.random() * colors.length);
+    all_button[i].classList.remove(all_button[i].classList[1]);
+    all_button[i].classList.add(colors[random]);
+  }
 }
