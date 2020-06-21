@@ -128,29 +128,25 @@ function buttonColorChange(buttonOption) {
 
 function buttonsRed() {
   for (let i = 0; i < all_button.length; i++) {
-    all_button[i].classList.remove(all_button[i].classList[1]);
-    all_button[i].classList.add("btn-danger");
+    all_button[i].classList.replace(all_button[i].classList[1], "btn-danger");
   }
 }
 
 function buttonsGreen() {
   for (let i = 0; i < all_button.length; i++) {
-    all_button[i].classList.remove(all_button[i].classList[1]);
-    all_button[i].classList.add("btn-success");
+    all_button[i].classList.replace(all_button[i].classList[1], "btn-success");
   }
 }
 
 function buttonsReset() {
   for (let i = 0; i < all_button.length; i++) {
-    all_button[i].classList.remove(all_button[i].classList[1]);
-    all_button[i].classList.add(mainColor[i]);
+    all_button[i].classList.replace(all_button[i].classList[1], mainColor[i]);
   }
 }
 
 function buttonRandom() {
   for (let i = 0; i < all_button.length; i++) {
     random = Math.floor(Math.random() * colors.length);
-    all_button[i].classList.remove(all_button[i].classList[1]);
-    all_button[i].classList.add(colors[random]);
+    all_button[i].classList.replace(all_button[i].classList[1], colors[random]);
   }
 }
