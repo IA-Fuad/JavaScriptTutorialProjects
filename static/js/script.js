@@ -150,3 +150,239 @@ function buttonRandom() {
     all_button[i].classList.replace(all_button[i].classList[1], colors[random]);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Challenge 5
+let blackjackGame = {
+  you: { scoreSpan: "#your-blackjack-result", div: "#your-box", 
+  score: 0, wins: 0, losses: 0, draws: 0, },
+  dealer: {
+    scoreSpan: "#dealer-blackjack-result", div: "#dealer-box", score: 0,
+  },
+  cards: ["2", "3", "4", "5", "6", "7", "8", "9", "10", "K", "J", "Q", "A"],
+  cardsValue: {
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 10,
+    K: 10,
+    J: 10,
+    Q: 10,
+    A: [1, 11],
+  },
+  isStand: false,
+  turnOver: false,
+};
+
+const YOU = blackjackGame["you"];
+const DEALER = blackjackGame["dealer"];
+
+const hitSound = new Audio("/static/sounds/swish.m4a");
+const winSound = new Audio("/static/sounds/cash.mp3");
+const lossSound = new Audio("/static/sounds/aww.mp3");
+
+document.querySelector("#hit-button").addEventListener("click", blackJackHit);
+document.querySelector("#stand-button").addEventListener("click", botPlay);
+document.querySelector("#deal-button").addEventListener("click", blackJackDeal);
+
+function blackJackHit() {
+  if (blackjackGame['isStand']){
+    return;
+  }
+
+  card = randomCard();
+  showCard(card, YOU);
+  updateScore(card, YOU);
+  showScore(YOU);
+
+  if (blackjackGame['you']['score'] > 21){
+    blackjackGame['turnOver'] = true;
+    blackjackGame['isStand'] = true;
+    showScore(YOU);
+    showResult(DEALER);
+    // blackJackDeal();
+  }
+}
+
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+// const botPlay = async () => {
+//   while (true) {
+//     await sleep(1000);
+//     let card = randomCard();
+//     showCard(card, DEALER);
+//     updateScore(card, DEALER);
+//     showScore(DEALER);
+
+//     if (DEALER["score"] > 21 || DEALER["score"] > YOU["score"] || DEALER["score"] == YOU["score"]) {
+//       blackjackGame['turnOver'] = true;
+//       showResult(computeWinner());
+//       return;
+//     }
+//   }
+// }
+
+async function botPlay() {
+  if (blackjackGame['isStand']){
+    return;
+  }
+  blackjackGame['isStand'] = true;
+  while (true) {
+    let card = randomCard();
+    showCard(card, DEALER);
+    updateScore(card, DEALER);
+    showScore(DEALER);
+
+    if (DEALER["score"] > 21 || DEALER["score"] > YOU["score"] || DEALER["score"] == YOU["score"]) {
+      blackjackGame['turnOver'] = true;
+      showResult(computeWinner());
+      return;
+    }
+
+    await sleep(1000);
+  }
+}
+
+function showCard(card, activePlayer) {
+  if (activePlayer["score"] > 21) {
+    return;
+  }
+  let cardImage = document.createElement("img");
+  cardImage.src = `/static/images/${card}.png`;
+  document.querySelector(activePlayer["div"]).appendChild(cardImage);
+  hitSound.play();
+}
+
+function blackJackDeal() {
+  if (!blackjackGame['turnOver'] || !blackjackGame['isStand']){
+    return;
+  }
+  blackjackGame['turnOver'] = false;
+  blackjackGame['isStand'] = false;
+
+  let yourImages = document.querySelector("#your-box").querySelectorAll("img");
+  let dealerImages = document
+    .querySelector("#dealer-box")
+    .querySelectorAll("img");
+  for (let i = 0; i < yourImages.length; i++) {
+    yourImages[i].remove();
+  }
+  for (let i = 0; i < dealerImages.length; i++) {
+    dealerImages[i].remove();
+  }
+
+  YOU["score"] = 0;
+  DEALER["score"] = 0;
+
+  document.querySelector("#your-blackjack-result").textContent = 0;
+  document.querySelector("#dealer-blackjack-result").textContent = 0;
+  document.querySelector("#blackjack-result").textContent = "Let's Play";
+
+  document.querySelector("#your-blackjack-result").style.color = "#fff";
+  document.querySelector("#dealer-blackjack-result").style.color = "#fff";
+  document.querySelector("#blackjack-result").style.color = "black";
+}
+
+function randomCard() {
+  let randomIndex = Math.floor(Math.random() * 13);
+  return blackjackGame["cards"][randomIndex];
+}
+
+function updateScore(card, activePlayer) {
+  if (card == "A") {
+    if (activePlayer["score"] + 11 > 21) {
+      activePlayer["score"] += blackjackGame["cardsValue"][card][0];
+    } else {
+      activePlayer["score"] += blackjackGame["cardsValue"][card][1];
+    }
+  } else {
+    activePlayer["score"] += blackjackGame["cardsValue"][card];
+  }
+  console.log(activePlayer['score']);
+}
+
+function showScore(activePlayer) {
+  if (activePlayer["score"] > 21) {
+    document.querySelector(activePlayer["scoreSpan"]).textContent = "BUST";
+    document.querySelector(activePlayer["scoreSpan"]).style.color = "red";
+  } else {
+    document.querySelector(activePlayer["scoreSpan"]).textContent =
+      activePlayer["score"];
+  }
+}
+
+function computeWinner() {
+  let winner;
+
+  if (YOU["score"] <= 21) {
+    if (YOU["score"] > DEALER["score"] || DEALER["score"] > 21) {
+      console.log("you");
+      winner = YOU;
+    } else if (YOU["score"] < DEALER["score"]) {
+      console.log("dealer");
+      winner = DEALER;
+    } else {
+      console.log("draw");
+    }
+  } else if (YOU["score"] > 21 && DEALER["score"] <= 21) {
+    console.log("dealer");
+    winner = DEALER;
+  } else {
+    console.log("draw");
+  }
+
+  return winner;
+}
+
+function showResult(winner) {
+  if (winner == YOU){
+    blackjackGame['you']['wins']++;
+  }
+  else if(winner == DEALER){
+    blackjackGame['you']['losses']++;
+  }
+  else{
+    blackjackGame['you']['draws']++;
+  }
+
+  let message, messageColor;
+
+  if (winner === YOU) {
+    message = "You Won!";
+    messageColor = "green";
+    winSound.play();
+  } else if (winner === DEALER) {
+    message = "You Lost!";
+    messageColor = "red";
+    lossSound.play();
+  } else {
+    message = "You Drew!";
+    messageColor = "Black";
+  }
+
+  document.querySelector("#blackjack-result").textContent = message;
+  document.querySelector("#blackjack-result").style.color = messageColor;
+  document.querySelector('#wins').textContent = blackjackGame['you']['wins'];
+  document.querySelector('#loses').textContent = blackjackGame['you']['losses'];
+  document.querySelector('#draws').textContent = blackjackGame['you']['draws'];
+}
